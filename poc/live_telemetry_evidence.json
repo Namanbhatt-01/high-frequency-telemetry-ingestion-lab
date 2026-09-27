@@ -1,0 +1,35 @@
+{
+  "timestamp_utc": "2026-09-27T13:26:11.675947Z",
+  "host_system": "Darwin Namans-MacBook-Air.local 25.5.0 Darwin Kernel Version 25.5.0: Mon Apr 27 20:38:00 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T8103 arm64",
+  "docker_ps": "NAMES                  STATUS                    PORTS\nlab5_streaming_agent   Up 19 minutes (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp\nlab5_traffic_gen       Up 19 minutes             \nlab5_grafana           Up 19 minutes (healthy)   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp\nlab5_telegraf          Up 19 minutes             8092/udp, 8125/udp, 0.0.0.0:8094->8094/udp, [::]:8094->8094/udp, 8094/tcp, 0.0.0.0:8186->8186/tcp, [::]:8186->8186/tcp\nlab5_influxdb          Up 20 minutes (healthy)   0.0.0.0:8086->8086/tcp, [::]:8086->8086/tcp",
+  "phases": {
+    "baseline": {
+      "streaming_rate_mbps": 4036.63,
+      "queue_depth_percent": 20.1,
+      "microburst_drops": 665,
+      "agent_health": {
+        "status": "HEALTHY",
+        "switch_id": "leaf-switch-01.ai-fabric.net",
+        "cadence_ms": 100,
+        "current_queue_depth": 12.98,
+        "total_incast_drops": 50141
+      }
+    },
+    "incast_microburst": {
+      "burst_trigger_response": {
+        "status": "BURST_INJECTED",
+        "burst_mbps": 18500.0,
+        "duration_sec": 1.5
+      },
+      "streaming_peak_rate_mbps": 21048.57,
+      "snmp_averaged_rate_mbps": 3425.0,
+      "peak_queue_depth_percent": 99.46,
+      "microburst_drops_captured": 1300,
+      "sampling_advantage_factor": "3,000x Cadence Advantage"
+    },
+    "recovery": {
+      "queue_depth_percent_restored": 13.36,
+      "remediation_status": "NORMALIZED"
+    }
+  }
+}

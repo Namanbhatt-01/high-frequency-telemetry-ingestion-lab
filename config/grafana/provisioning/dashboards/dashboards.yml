@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'AI Fabric Telemetry'
+    orgId: 1
+    folder: 'AI Fabric Observability'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

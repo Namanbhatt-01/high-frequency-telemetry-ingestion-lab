@@ -1,0 +1,53 @@
+name: Lab 5 - High-Frequency Streaming Telemetry CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-telemetry-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Start Lab 5 TIG Observability Stack
+        run: |
+          docker compose up -d --build
+
+      - name: Await Stack Convergence
+        run: |
+          echo "Awaiting InfluxDB and Telemetry Agent initialization..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8086/ping >/dev/null 2>&1 && curl -s http://localhost:8080/health >/dev/null 2>&1; then
+              echo "Stack is healthy!"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Execute High-Frequency Telemetry Assertions
+        run: |
+          python3 verify_telemetry_pipeline.py
+
+      - name: Execute SNMP vs Streaming Comparative Analysis
+        run: |
+          python3 snmp_comparison/compare_streaming_vs_snmp.py
+
+      - name: Teardown Lab 5 Stack
+        if: always()
+        run: |
+          docker compose down -v --remove-orphans
