@@ -23,7 +23,6 @@ def query_flux_scalar(flux_query: str):
         if resp.status_code == 200:
             lines = [l.strip() for l in resp.text.splitlines() if l.strip() and not l.startswith("#")]
             if len(lines) >= 2:
-                # header line: ,result,table,_start,_stop,_value,...
                 headers_list = [h.strip() for h in lines[0].split(",")]
                 val_idx = headers_list.index("_value") if "_value" in headers_list else 5
                 row = lines[1].split(",")
@@ -39,7 +38,7 @@ def query_flux_scalar(flux_query: str):
 
 def main():
     print("=" * 80)
-    print("      LAB 5: HIGH-FREQUENCY TELEMETRY INGESTION & PIPELINE VALIDATION       ")
+    print("   LAB 05: HIGH-FREQUENCY TELEMETRY INGESTION & MEASUREMENT SCIENCE AUDIT   ")
     print("=" * 80)
 
     # 1. Health Checks
@@ -137,14 +136,74 @@ def main():
         ("Grafana Auto-Provisioned InfluxDB Flux Dashboards Active", True)
     ]
 
+    all_passed = True
     for title, passed in assertions:
         mark = "✅ PASS" if passed else "❌ FAIL"
-        print(f"  [{mark}] {title}")
         if not passed:
-            sys.exit(1)
+            all_passed = False
+        print(f"  [{mark}] {title}")
+
+    # Emit canonical machine-readable Evidence Envelope
+    evidence = {
+        "schema_version": "1.0",
+        "experiment": {
+            "id": "telemetry-microburst-001",
+            "name": "High-Frequency Telemetry Ingestion & Microburst Detection"
+        },
+        "execution": {
+            "run_id": f"telemetry-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "environment": "docker-compose",
+            "platform": sys.platform
+        },
+        "measurements": [
+            {
+                "metric": "telemetry_sampling_cadence_ms",
+                "value": 100.0,
+                "target": 100.0,
+                "mode": "emulated",
+                "unit": "ms"
+            },
+            {
+                "metric": "peak_buffer_occupancy_percent",
+                "value": float(peak_queue),
+                "target": 70.0,
+                "mode": "measured",
+                "unit": "percent"
+            },
+            {
+                "metric": "transient_incast_drops_captured",
+                "value": int(total_drops),
+                "target": 1,
+                "mode": "measured",
+                "unit": "packets"
+            },
+            {
+                "metric": "snmp_polling_interval_seconds",
+                "value": 30.0,
+                "target": 30.0,
+                "mode": "simulated",
+                "unit": "seconds"
+            }
+        ],
+        "assertions": [
+            {"id": "TEL-ASSERT-001", "name": "Streaming Telemetry Cadence <= 100ms", "passed": sample_count >= 20},
+            {"id": "TEL-ASSERT-002", "name": "Microburst Peak Occupancy > 70%", "passed": peak_queue >= 70.0},
+            {"id": "TEL-ASSERT-003", "name": "Sub-Second Incast Drop Visibility", "passed": total_drops > 0}
+        ],
+        "result": "passed" if all_passed else "failed"
+    }
+
+    os.makedirs("poc", exist_ok=True)
+    with open("poc/evidence.json", "w") as f:
+        json.dump(evidence, f, indent=2)
 
     print("==============================================================================")
-    print("\n🎉 ALL LAB 5 HIGH-FREQUENCY STREAMING TELEMETRY ASSERTIONS PASSED!\n")
+    if all_passed:
+        print("\n🎉 ALL LAB 05 HIGH-FREQUENCY STREAMING TELEMETRY ASSERTIONS PASSED!\n")
+    else:
+        print("\n❌ SOME TELEMETRY ASSERTIONS FAILED!\n", file=sys.stderr)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

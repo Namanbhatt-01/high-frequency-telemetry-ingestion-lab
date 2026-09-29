@@ -1,10 +1,13 @@
-name: Lab 5 - High-Frequency Streaming Telemetry CI
+name: Lab 05 - High-Frequency Streaming Telemetry CI
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
+permissions:
+  contents: read
 
 jobs:
   validate-telemetry-pipeline:
@@ -24,7 +27,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Start Lab 5 TIG Observability Stack
+      - name: Start Lab 05 TIG Observability Stack
         run: |
           docker compose up -d --build
 
@@ -47,7 +50,7 @@ jobs:
         run: |
           python3 snmp_comparison/compare_streaming_vs_snmp.py
 
-      - name: Teardown Lab 5 Stack
+      - name: Teardown Lab 05 Stack
         if: always()
         run: |
           docker compose down -v --remove-orphans
